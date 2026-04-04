@@ -66,7 +66,7 @@ Each step records an 11-dimensional state vector:
 
 ### Option 1 — Imitation Learning (Behavioural Cloning)
 
-**Concept:** Let A\* play 200 games per maze, record every `(state → action)` pair as labelled data, and train an MLP to replicate A\*'s decisions. At inference time the neural network decides — no search at all.
+**Concept:** Let A\* play 200 games per maze, record every `(state → action)` pair as labelled data, and train an MLP to replicate A\*'s decisions. At inference time the neural network decides no search at all.
 
 **Results:**
 
@@ -90,7 +90,7 @@ The 4.8% performance gap between seen and unseen mazes demonstrates **covariate 
 | danger_left | 9.8% |
 | food signals | ~5% combined |
 
-Direction signals dominate at 41% combined. Danger signals follow at 49%. Food direction accounts for only 5%. The imitation model learned A\*'s actual priority ordering: **avoid walls first, navigate toward food second** — not the reverse, as one might naively expect.
+Direction signals dominate at 41% combined. Danger signals follow at 49%. Food direction accounts for only 5%. The imitation model learned A\*'s actual priority ordering: **avoid walls first, navigate toward food second** not the reverse, as one might naively expect.
 
 ---
 
@@ -106,7 +106,7 @@ Direction signals dominate at 41% combined. Danger signals follow at 49%. Food d
 | Gradient Boosting | 97.1% | 97.1% | 4224s |
 | Logistic Regression | 96.8% | 96.8% | 45s |
 
-**Key finding:** Logistic Regression achieves 96.8% — only 0.3% behind Random Forest. This means the 11-dimensional state space is **almost perfectly linearly separable**. The binary danger/direction flags create clean hyperplanes that a linear model can exploit. Adding tree complexity (RF, GBM) provides marginal benefit at significant compute cost — a meaningful model selection insight.
+**Key finding:** Logistic Regression achieves 96.8% — only 0.3% behind Random Forest. This means the 11-dimensional state space is **almost perfectly linearly separable**. The binary danger/direction flags create clean hyperplanes that a linear model can exploit. Adding tree complexity (RF, GBM) provides marginal benefit at significant compute cost a meaningful model selection insight.
 
 **Random Forest feature importances:**
 
@@ -151,13 +151,13 @@ Linear Regression achieves LOO R² = 1.000 on this dataset. Note: with 5 mazes, 
 | 1 | 822 | 60.3 | 6.0 | Short games, less food |
 | 2 | 0 | 0.0 | 0.0 | Immediate no-path episodes |
 
-**Most important finding:** All three agents split across clusters in nearly identical proportions — A\* (636/320/44), BFS (622/333/45), GBFS (630/320/50). The clustering found **no algorithmic separation**. Maze complexity, not algorithm choice, determines which cluster an episode falls into. A\* and BFS are behaviourally indistinguishable at the episode level — they reach food with the same efficiency and the same failure patterns.
+**Most important finding:** All three agents split across clusters in nearly identical proportions A\* (636/320/44), BFS (622/333/45), GBFS (630/320/50). The clustering found **no algorithmic separation**. Maze complexity, not algorithm choice, determines which cluster an episode falls into. A\* and BFS are behaviourally indistinguishable at the episode level they reach food with the same efficiency and the same failure patterns.
 
 ---
 
 ### Option 5 — High-Danger State Prediction
 
-**Concept:** Since well-designed mazes ensure agents never die, the failure label is redefined as "high-danger state" — steps where the snake is surrounded on 2+ sides, or its current heading leads directly into a wall. This mirrors real-world predictive maintenance: flag pre-failure conditions before the event, not after.
+**Concept:** Since well-designed mazes ensure agents never die, the failure label is redefined as "high-danger state" steps where the snake is surrounded on 2+ sides, or its current heading leads directly into a wall. This mirrors real-world predictive maintenance: flag pre-failure conditions before the event, not after.
 
 **Dataset:** 526,600 high-danger steps (11.5%) from 4.56M total steps.
 
@@ -169,7 +169,7 @@ Linear Regression achieves LOO R² = 1.000 on this dataset. Note: with 5 mazes, 
 | Random Forest | 1.0000 | 1.0000 | 99.99% |
 | Gradient Boosting | 1.0000 | 1.0000 | 100.00% |
 
-**Perfect AUC explained:** The danger label was defined using `danger_*` flags that are also input features. The model learned a deterministic rule already encoded in the feature vector — confirming that the state representation is correctly engineered. A ROC-AUC of 1.0 here means "the features are sufficient to perfectly determine danger" rather than "the model overfit."
+**Perfect AUC explained:** The danger label was defined using `danger_*` flags that are also input features. The model learned a deterministic rule already encoded in the feature vector confirming that the state representation is correctly engineered. A ROC-AUC of 1.0 here means "the features are sufficient to perfectly determine danger" rather than "the model overfit."
 
 **Feature importances (danger prediction):**
 
@@ -182,7 +182,7 @@ Linear Regression achieves LOO R² = 1.000 on this dataset. Note: with 5 mazes, 
 | dir_y | 5.0% |
 | dir_x | 3.9% |
 
-Danger flags dominate at 88% combined. This contrasts sharply with the action classifier where direction dominated at 64%. The two models learned fundamentally different patterns from the same features — **what drives action choice** vs **what indicates danger** are different things.
+Danger flags dominate at 88% combined. This contrasts sharply with the action classifier where direction dominated at 64%. The two models learned fundamentally different patterns from the same features: **what drives action choice** vs **what indicates danger** are different things.
 
 ---
 
@@ -207,7 +207,7 @@ GBFS has 2.5× more anomalies than A\*. This is explainable: GBFS uses a greedy 
 | A\* | Maze4_hard | 92.0 | 56.0 | **39.1%** |
 | BreadthFirst | Maze4_hard | 107.0 | 53.0 | **50.5%** |
 
-Both A\* and BFS show significant score degradation in later episodes on the hard maze. Both algorithms perform ~45% worse in the second half of 200 episodes than the first. The cause is random food placement — as episodes progress, food spawns in increasingly difficult positions relative to the maze structure. This performance drift mirrors real-world model degradation under distribution shift.
+Both A\* and BFS show significant score degradation in later episodes on the hard maze. Both algorithms perform ~45% worse in the second half of 200 episodes than the first. The cause is random food placement as episodes progress, food spawns in increasingly difficult positions relative to the maze structure. This performance drift mirrors real-world model degradation under distribution shift.
 
 ---
 
@@ -219,12 +219,12 @@ Both A\* and BFS show significant score degradation in later episodes on the har
 Food direction features dominate (food_left=6.0%, food_down=5.0%), with danger signals secondary. The classifier learned that food direction is the primary action driver across all three agents.
 
 **Failure Predictor (danger classifier):**
-Danger flags are perfectly symmetric (danger_left=18.1%, danger_right=18.1%, danger_up=17.7%, danger_down=17.7%). All four directions contribute equally — danger from any direction matters equally for flagging a high-risk state.
+Danger flags are perfectly symmetric (danger_left=18.1%, danger_right=18.1%, danger_up=17.7%, danger_down=17.7%). All four directions contribute equally danger from any direction matters equally for flagging a high-risk state.
 
 **Imitation MLP (A\* imitator):**
 Food_left dominates (10.0%), followed by food_right (6.0%) and danger_up (5.6%). The MLP learned that lateral food position is the strongest signal for A\*'s left/right action choice — consistent with A\*'s horizontal-first path planning on these maze layouts.
 
-**Cross-model insight:** Direction signals (`dir_x`, `dir_y`) matter most for imitation learning but least for danger prediction. Danger flags matter most for danger prediction but least for imitation. The same 11 features carry different information for different tasks — a validation of the feature engineering design.
+**Cross-model insight:** Direction signals (`dir_x`, `dir_y`) matter most for imitation learning but least for danger prediction. Danger flags matter most for danger prediction but least for imitation. The same 11 features carry different information for different tasks, a validation of the feature engineering design.
 
 ---
 
@@ -251,20 +251,20 @@ pip install -r requirements.txt
 
 ### Run the Full Pipeline
 ```bash
-# Step 1 — Collect game data (headless, ~7 min)
+# Step 1: Collect game data (headless, ~7 min)
 python main.py --mode simulate
 
-# Step 2 — Train all 6 ML modules (~2 hours for GBM, rest is fast)
+# Step 2: Train all 6 ML modules (~2 hours for GBM, rest is fast)
 python main.py --mode train
 
-# Step 3 — Run SHAP explainability analysis (~10 min)
+# Step 3: Run SHAP explainability analysis (~10 min)
 python main.py --mode analyze
 
-# Step 4 — Launch the dashboard
+# Step 4: Launch the dashboard
 python main.py --mode dashboard
 # Open http://localhost:8501
 
-# Optional — Watch a live game
+# Optional: Watch a live game
 python main.py --mode play --agent AStar
 python main.py --mode play --agent BreadthFirst
 python main.py --mode play --agent GreedyBestFirst
@@ -317,11 +317,11 @@ git push -u origin main
 ```
 
 **Important — what NOT to push (handled by .gitignore):**
-- `data/game_log.csv` — 4.5M rows, too large for GitHub (>500MB)
-- `data/episode_stats.csv` — regenerated by `--mode simulate`
-- `models/` — all PKL files, regenerated by `--mode train`
-- `.venv/` — local virtual environment
-- `experiments/` — MLflow runs
+- `data/game_log.csv`  4.5M rows, too large for GitHub (>500MB)
+- `data/episode_stats.csv`  regenerated by `--mode simulate`
+- `models/`  all PKL files, regenerated by `--mode train`
+- `.venv/`  local virtual environment
+- `experiments/`  MLflow runs
 
 **What IS committed:**
 - All source code
@@ -365,13 +365,7 @@ ANOMALY_DRIFT_DROP      = 0.30   # 30% score drop triggers drift alert
 IMITATION_TEST_MAZES    = ["Maze4_hard.txt", "Maze5_dense.txt"]  # held-out
 ```
 
----
 
-## CV / Portfolio Summary
-
-> "Built a multi-agent ML benchmarking framework that audits classical pathfinding algorithms (A\*, BFS, GBFS) across 5 maze configurations. Collected 4.56M game steps, applied 6 ML techniques (Behavioural Cloning, Random Forest/GBM/LR comparison, Difficulty Regression, K-Means Clustering, Danger Prediction, Isolation Forest Anomaly Detection), and implemented SHAP-based explainability. Achieved 97.1% action prediction accuracy, detected performance drift on hard mazes (50% score drop), and identified that maze complexity — not algorithm choice — is the primary behavioural determinant. Deployed as a Streamlit dashboard with MLflow experiment tracking and Dockerized for reproducibility."
-
----
 
 ## Tech Stack
 
