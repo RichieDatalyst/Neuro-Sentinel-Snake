@@ -1,0 +1,21 @@
+# Neuro-Sentinel Snake — Python dependencies
+# Install: pip install -r requirements.txt
+
+# ── Core ML ──────────────────────────────────────────────────────────────
+scikit-learn>=1.3.0
+numpy>=1.24.0
+pandas>=2.0.0
+
+# ── Explainability ────────────────────────────────────────────────────────
+shap>=0.42.0            # for SHAP explanations
+# ── Experiment tracking ───────────────────────────────────────────────────
+mlflow>=3.10.1
+
+pytest>=9.0.2    # for unit testing
+
+# ── Dashboard ─────────────────────────────────────────────────────────────
+streamlit>=1.32.0
+plotly>=5.18.0
+
+# ── Utilities ─────────────────────────────────────────────────────────────
+scipy>=1.11.0          # used internally by scikit-learn and shap

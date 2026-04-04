@@ -1,0 +1,57 @@
+name: Neuro-Sentinel Snake CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt pytest
+
+      - name: Run smoke simulation (2 episodes per combo)
+        run: python main.py --mode simulate --episodes 2
+
+      - name: Run full ML training pipeline
+        run: python main.py --mode train
+
+      - name: Run pytest suite
+        run: python -m pytest tests/ -v --tb=short
+
+      - name: Verify all model files created
+        run: |
+          python - << 'EOF'
+          import os
+          models = [
+            "models/imitation_mlp.pkl",
+            "models/rf_classifier.pkl",
+            "models/failure_predictor.pkl",
+            "models/anomaly_detector.pkl",
+            "models/maze_difficulty.pkl",
+          ]
+          missing = [m for m in models if not os.path.exists(m)]
+          if missing:
+              print("MISSING:", missing)
+              exit(1)
+          print("All model files present. CI passed.")
+          EOF

@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+*.egg-info/
+
+# Data files — too large for git
+data/game_log.csv
+data/episode_stats.csv
+
+# Keep these small derived files
+!data/maze_features.csv
+!data/clustering_artifacts.json
+!data/shap_*.json
+!data/drift_report.csv
+
+# Trained models — regenerate with: python main.py --mode train
+models/
+
+# MLflow runs
+experiments/
+
+# Streamlit cache
+.streamlit/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Jupyter
+.ipynb_checkpoints/

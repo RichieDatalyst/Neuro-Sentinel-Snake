@@ -1,0 +1,13 @@
+{
+  "food_left": 0.099553,
+  "food_right": 0.060377,
+  "danger_up": 0.056435,
+  "food_down": 0.04667,
+  "danger_right": 0.031587,
+  "dist_to_food": 0.03003,
+  "danger_down": 0.021905,
+  "dir_x": 0.018428,
+  "dir_y": 0.011242,
+  "danger_left": 0.009421,
+  "food_up": 0.007149
+}
