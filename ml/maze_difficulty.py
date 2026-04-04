@@ -1,17 +1,6 @@
-"""
-ml/maze_difficulty.py — Option 3: Maze Difficulty Regression
-
-Extracts structural features from agent performance on each maze and
-trains a regression model to predict maze difficulty score.
-
-Key fix: difficulty score now uses avg_steps_per_food and dead_end_entries
-as primary signals — these vary meaningfully even when no agent dies,
-giving the regression real variance to work with.
-
-Run:
-    python -m ml.maze_difficulty
-"""
-
+# Maze Difficulty Regression —> predict the composite difficulty score of a maze based on aggregate episode stats
+# This is more of an analysis tool than a practical predictor, given the small dataset (10 mazes) and the fact that the difficulty score is derived from the same stats —> interpret with caution!  
+# Run: python -m ml.maze_difficulty
 import os, sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -39,17 +28,8 @@ REGRESSION_FEATURES = [
 
 def _compute_difficulty(grouped: pd.DataFrame) -> pd.DataFrame:
     """
-    Compute a difficulty score that has real variance even when
-    no agents die. Uses a weighted combination of normalised features.
-
-    Score components (all normalised 0-1 within the dataset):
-      - avg_steps_per_food  : more steps to reach food = harder  (40%)
-      - avg_dead_ends       : more dead-end encounters = harder   (30%)
-      - 1 - avg_optimality  : less optimal paths = harder         (20%)
-      - death_rate          : dying = hardest signal               (10%)
-
-    Death rate is intentionally downweighted so easy mazes with
-    zero deaths still separate from each other on the other signals.
+    Compute a composite difficulty score for each maze based on multiple performance metrics.
+    The score is a weighted sum of normalized metrics:
     """
     def norm(s):
         rng = s.max() - s.min()
@@ -96,7 +76,6 @@ def train(log_mlflow: bool = True):
               "avg_optimality", "death_rate", "difficulty_score"]
             ].round(3).to_string(index=False))
 
-    # Check variance — regression needs it
     score_std = df["difficulty_score"].std()
     print(f"\n  Difficulty score std: {score_std:.4f}")
 
@@ -105,7 +84,7 @@ def train(log_mlflow: bool = True):
               "regression is not meaningful. This happens when all "
               "agents perform identically across all mazes.")
         print("  Saving a passthrough model and continuing.")
-        # Save a dummy model that returns the mean
+        
         bundle = {
             "model":    None,
             "scaler":   None,
@@ -140,8 +119,8 @@ def train(log_mlflow: bool = True):
         model.fit(X_s, y)
         train_mae = mean_absolute_error(y, model.predict(X_s))
 
-        # LOO CV — suppress the UndefinedMetric warning (expected with 1-sample folds)
-        # Fall back to train R² when all LOO folds are undefined (too few samples)
+        # LOO CV —> gives a more realistic estimate of generalisation on unseen mazes,
+        # but can be unstable with very small datasets (only 10 mazes) —> handle warnings and fallback to train score if needed
         train_r2 = r2_score(y, model.predict(X_s))
         if len(df) >= 3:
             with warnings.catch_warnings():

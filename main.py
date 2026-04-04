@@ -18,11 +18,6 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import config as C
 
-
-# ---------------------------------------------------------------------------
-# Mode handlers
-# ---------------------------------------------------------------------------
-
 def mode_simulate(episodes: int):
     from ml.logger import run_simulation
     run_simulation(episodes_per_combo=episodes, verbose=True)
@@ -42,32 +37,32 @@ def mode_train():
         print(f"\n  ERROR: {e}")
         sys.exit(1)
 
-    # 2. Option 1 — Imitation Learning
+    # 2. Option 1: Imitation Learning
     print("\n[1/5] Imitation Learning...")
     from ml.imitation import train as train_imitation
     train_imitation(log_mlflow=True)
 
-    # 3. Option 2 — Classical Classifiers
+    # 3. Option 2: Classical Classifiers
     print("\n[2/5] Classical ML Classifiers...")
     from ml.classifier import train as train_classifier
     train_classifier(log_mlflow=True)
 
-    # 4. Option 3 — Maze Difficulty
+    # 4. Option 3: Maze Difficulty
     print("\n[3/5] Maze Difficulty Regression...")
     from ml.maze_difficulty import train as train_maze
     train_maze(log_mlflow=True)
 
-    # 5. Option 4 — Clustering
+    # 5. Option 4: Clustering
     print("\n[4/5] Behaviour Clustering...")
     from ml.clustering import train as train_clustering
     train_clustering(log_mlflow=True)
 
-    # 6. Option 5 — Failure Prediction
+    # 6. Option 5: Failure Prediction
     print("\n[5/5] Failure Prediction...")
     from ml.failure_predictor import train as train_failure
     train_failure(log_mlflow=True)
 
-    # 7. Option 6 — Anomaly Detection (runs on episode data produced above)
+    # 7. Option 6: Anomaly Detection (runs on episode data produced above)
     print("\n[+] Anomaly Detection...")
     from ml.anomaly_detector import train as train_anomaly
     train_anomaly(log_mlflow=True)
@@ -148,10 +143,6 @@ def mode_play(agent_name: str):
     t.start()
     viewer.top.mainloop()
 
-
-# ---------------------------------------------------------------------------
-# CLI
-# ---------------------------------------------------------------------------
 
 def parse_args():
     p = argparse.ArgumentParser(

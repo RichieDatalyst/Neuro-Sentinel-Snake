@@ -1,8 +1,5 @@
-"""
-core/agentsnake.py — Dispatcher that maps algorithm names to classes.
-Add new agents here without touching any other file.
-"""
-
+# Snake AI Agent: Unified Search Interface
+# Provides a single AgentSnake class that can use different search algorithms.
 from core.astar          import AStar
 from core.breadthfirst   import BreadthFirst
 from core.greedybestfirst import GreedyBestFirst

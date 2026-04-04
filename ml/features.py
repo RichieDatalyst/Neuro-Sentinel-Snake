@@ -1,9 +1,5 @@
-"""
-ml/features.py — Shared feature engineering.
-
-Every ML module imports from here. This is the single source of truth
-for which columns are features, which are labels, and how to load data.
-"""
+# features.py —> Core feature engineering functions for all ML options.
+# Run:  python -m ml.features
 
 import os
 import sys
@@ -14,11 +10,7 @@ import numpy as np
 import config as C
 
 
-# ---------------------------------------------------------------------------
-# Column definitions
-# ---------------------------------------------------------------------------
-
-# Core 11-dim state vector — input to all classifiers
+# Core 11-dim state vector for step-level models (Opt 1+2+5)
 STATE_FEATURES = [
     "danger_up", "danger_down", "danger_left", "danger_right",
     "food_up", "food_down", "food_left", "food_right",
@@ -34,14 +26,11 @@ EPISODE_FEATURES = [
 ]
 
 # Label columns
-LABEL_ACTION      = "action"           # Opt 1+2 — what action was taken
-LABEL_DIED_NEXT10 = "died_next_10"     # Opt 5  — will snake die soon
-LABEL_DIED        = "died"             # Opt 6  — did episode end in death
+LABEL_ACTION      = "action"           # Opt 1+2 —> what action was taken
+LABEL_DIED_NEXT10 = "died_next_10"     # Opt 5  —> will snake die soon
+LABEL_DIED        = "died"             # Opt 6  —> did episode end in death
 
 
-# ---------------------------------------------------------------------------
-# Loaders
-# ---------------------------------------------------------------------------
 
 def load_game_log() -> pd.DataFrame:
     """Load step-level log. Raises FileNotFoundError if logger hasn't run."""
@@ -65,16 +54,11 @@ def load_episode_stats() -> pd.DataFrame:
     return pd.read_csv(C.EPISODE_STATS_PATH)
 
 
-# ---------------------------------------------------------------------------
-# Validation
-# ---------------------------------------------------------------------------
-
 def _validate_game_log(df: pd.DataFrame):
     """Catch common data quality issues early."""
     issues = []
 
-    # Food should never be on a wall — we can't check the maze map here
-    # but we can check that food coordinates are reasonable
+    # Food coordinates should never be negative that would be outside the maze
     if (df["food_x"] < 0).any() or (df["food_y"] < 0).any():
         issues.append("Negative food coordinates detected.")
 
@@ -97,9 +81,6 @@ def _validate_game_log(df: pd.DataFrame):
         print("[Data validation passed]")
 
 
-# ---------------------------------------------------------------------------
-# Feature builders
-# ---------------------------------------------------------------------------
 
 def get_imitation_data(agent: str = "AStar", exclude_mazes: list = None):
     """
@@ -154,8 +135,8 @@ def get_episode_data():
 
 def get_maze_features() -> pd.DataFrame:
     """
-    Return maze structural features for difficulty regression (Opt 3).
-    Computed from episode_stats by aggregating per maze.
+    Compute maze-level features by aggregating episode stats.
+    These are used for analysis and interpretation, not as ML features.
     """
     ep = load_episode_stats()
     grouped = ep.groupby("maze").agg(
@@ -169,8 +150,7 @@ def get_maze_features() -> pd.DataFrame:
         avg_steps_per_food = ("steps_per_food",  "mean"),
     ).reset_index()
 
-    # Difficulty score — normalised so easy mazes separate even with 0 deaths.
-    # Weights: steps_per_food=40%, dead_ends=30%, optimality=20%, deaths=10%
+
     def _norm(s):
         rng = s.max() - s.min()
         return (s - s.min()) / rng if rng > 1e-9 else pd.Series(
@@ -187,9 +167,6 @@ def get_maze_features() -> pd.DataFrame:
     return grouped
 
 
-# ---------------------------------------------------------------------------
-# Action encoding helper
-# ---------------------------------------------------------------------------
 
 ACTION_LABELS = {0: "Up", 3: "Right", 6: "Down", 9: "Left"}
 ACTION_CODES  = sorted(ACTION_LABELS.keys())   # [0, 3, 6, 9]

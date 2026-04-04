@@ -1,4 +1,4 @@
-"""core/greedybestfirst.py — Greedy Best-First search agent."""
+"""Greedy Best-First search agent."""
 
 import heapq
 

@@ -1,21 +1,5 @@
-"""
-ml/failure_predictor.py — Option 5: High-Danger State Prediction
-
-Predicts whether the current game state is "high danger" — defined as:
-  1. The snake is surrounded on 2+ sides by walls/boundaries, OR
-  2. The snake's current movement direction leads directly into a wall
-
-Since our well-designed mazes ensure algorithms never actually die,
-we use danger-proximity as the positive label rather than actual death.
-This is semantically correct — a predictive maintenance system flags
-imminent risk, not just post-mortem failure.
-
-Real-world parallel: detecting "pre-failure" conditions in industrial
-equipment before the actual breakdown occurs.
-
-Run:
-    python -m ml.failure_predictor
-"""
+# failure_predictor.py —> Train a binary classifier to predict high-danger states. Run:
+# python -m ml.failure_predictor
 
 import os, sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -43,7 +27,7 @@ def _build_danger_label(df: pd.DataFrame) -> np.ndarray:
     High danger is defined as ANY of:
       - 2 or more danger flags are 1 simultaneously (boxed in on multiple sides)
       - All four food direction flags are 0 (snake is aligned with food on both axes
-        but still surrounded — disoriented state)
+        but still surrounded disoriented state)
       - danger_straight = 1: the direction the snake is currently moving leads
         into a wall within 1 step
 
@@ -66,7 +50,7 @@ def _build_danger_label(df: pd.DataFrame) -> np.ndarray:
     moving_up    = (df["dir_y"] == -1) & (df["danger_up"]    == 1)
     heading_into_wall = (moving_right | moving_left | moving_down | moving_up).astype(int)
 
-    # Union: either condition makes it high danger
+    
     label = np.maximum(boxed_in.values, heading_into_wall.values)
     return label
 
@@ -76,7 +60,7 @@ def train(log_mlflow: bool = True):
     print(f"  Option 5 — High-Danger State Prediction")
     print("="*60)
 
-    # Load full game log and build danger label from state features
+    
     df = load_game_log()
     y_full = _build_danger_label(df)
     X_full = df[STATE_FEATURES].values
@@ -90,7 +74,7 @@ def train(log_mlflow: bool = True):
     print(f"  Safe (0)         : {int(neg):,}  ({100-ratio:.1f}%)")
     print(f"\n  Label definition: 2+ danger flags OR heading directly into wall")
 
-    # Check we have both classes
+    
     if len(np.unique(y_full)) < 2:
         print("\n  WARNING: Only one class found in labels.")
         print("  This means all states are either all-safe or all-dangerous.")
@@ -107,10 +91,10 @@ def train(log_mlflow: bool = True):
             pickle.dump(bundle, f)
         return bundle
 
-    # Stratified sample for speed
+    
     sample_size = min(getattr(C, 'FAILURE_SAMPLE_SIZE', 80_000), len(y_full))
 
-    # Ensure we get both classes in sample via stratification
+    
     pos_idx = np.where(y_full == 1)[0]
     neg_idx = np.where(y_full == 0)[0]
     rng     = np.random.default_rng(C.FAILURE_RANDOM_STATE)

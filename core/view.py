@@ -1,9 +1,5 @@
-"""
-core/view.py — Tkinter game viewer.
-
-Supports single-agent view and side-by-side comparison mode.
-Original skeleton by Mirza Mubasher Baig, extended for benchmarking.
-"""
+# Snake AI Agent: View Module
+# Renders the game state for a single agent or side-by-side comparison of two agents.
 
 import tkinter as tk
 import os
@@ -12,11 +8,6 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import config as C
 from core import State as st
-
-
-# ---------------------------------------------------------------------------
-# Single-agent viewer (original, cleaned up)
-# ---------------------------------------------------------------------------
 
 class SnakeViewer:
     """View for one snake agent."""
@@ -102,11 +93,6 @@ class SnakeViewer:
     def ShowGameOverMessage(self, message: str):
         self.top.title(message)
 
-
-# ---------------------------------------------------------------------------
-# Side-by-side comparison viewer (two agents, one window)
-# ---------------------------------------------------------------------------
-
 class DualSnakeViewer:
     """
     Renders two agents side-by-side for benchmark comparison.
@@ -129,7 +115,7 @@ class DualSnakeViewer:
         self.top.title(f"Benchmark: {label_a}  vs  {label_b}")
         self.top.configure(bg="#1a1a1a")
 
-        # ── Left panel ────────────────────────────────────────────────────
+    
         frame_a = tk.Frame(self.top, bg="#1a1a1a")
         frame_a.pack(side=tk.LEFT, padx=8, pady=8)
 
@@ -146,12 +132,10 @@ class DualSnakeViewer:
             anchor=tk.NW, font=("Times", 11, "bold"), fill="green"
         )
 
-        # ── Divider ───────────────────────────────────────────────────────
         tk.Frame(self.top, width=2, bg="#444").pack(
             side=tk.LEFT, fill=tk.Y, padx=2
         )
 
-        # ── Right panel ───────────────────────────────────────────────────
         frame_b = tk.Frame(self.top, bg="#1a1a1a")
         frame_b.pack(side=tk.LEFT, padx=8, pady=8)
 
@@ -168,7 +152,6 @@ class DualSnakeViewer:
             anchor=tk.NW, font=("Times", 11, "bold"), fill="green"
         )
 
-        # Draw mazes
         self._draw_maze(self.canvas_a, state_a.maze)
         self._draw_maze(self.canvas_b, state_b.maze)
 

@@ -1,12 +1,5 @@
-"""
-tests/test_pipeline.py — Smoke tests for the full pipeline.
-
-Runs a 2-episode mini-simulation, checks data quality, and verifies
-all ML modules can instantiate and train without crashing.
-
-Run:
-    python -m pytest tests/ -v
-"""
+# This test suite runs a mini end-to-end pipeline on a tiny dataset (2 episodes per agent) to verify that all components work together without crashing and produce outputs of the expected shape and format. Run:
+#    python -m pytest tests/ -v
 
 import os
 import sys
@@ -18,10 +11,7 @@ import shutil
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 
-
-# ---------------------------------------------------------------------------
-# Fixtures
-# ---------------------------------------------------------------------------
+# Project imports (for config and constants)
 
 @pytest.fixture(scope="session")
 def tmp_data_dir(tmp_path_factory):
@@ -61,9 +51,7 @@ def mini_run(tmp_data_dir):
     return step_rows, ep_rows
 
 
-# ---------------------------------------------------------------------------
-# Logger tests
-# ---------------------------------------------------------------------------
+# Logger tests —> verify data quality and CSV output
 
 class TestLogger:
     def test_step_rows_not_empty(self, mini_run):
@@ -119,9 +107,7 @@ class TestLogger:
             assert agent in df["agent"].values, f"Agent '{agent}' missing from data"
 
 
-# ---------------------------------------------------------------------------
-# State tests
-# ---------------------------------------------------------------------------
+# State class tests —> verify state vector shape and value ranges
 
 class TestState:
     def test_get_state_length(self):
@@ -158,9 +144,7 @@ class TestState:
         assert reward == -100.0
 
 
-# ---------------------------------------------------------------------------
-# ML module smoke tests (train on tiny data, should not crash)
-# ---------------------------------------------------------------------------
+# ML module tests —> verify each module can train without crashing and returns expected keys
 
 class TestMLModules:
     def test_features_load(self, mini_run):
@@ -202,6 +186,5 @@ class TestMLModules:
     def test_maze_difficulty_train(self, mini_run):
         from ml.maze_difficulty import train
         result = train(log_mlflow=False)
-        # May return None if < 3 mazes ran — that's acceptable in smoke test
         if result is not None:
             assert "model" in result

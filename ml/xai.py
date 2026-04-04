@@ -1,16 +1,5 @@
-"""
-ml/xai.py — Explainability (XAI) using SHAP
-
-Runs SHAP analysis on all trained models:
-  - Imitation MLP      (Option 1)
-  - Random Forest      (Option 2)
-  - Failure Predictor  (Option 5)
-
-Saves SHAP values to data/ for the Streamlit dashboard to render.
-
-Run:
-    python -m ml.xai
-"""
+# XAI SHAP Explainability Analysis 
+# Run : python -m ml.xai
 
 import os, sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -24,11 +13,6 @@ from ml.features import (
     get_classifier_data, get_failure_data, encode_actions, STATE_FEATURES
 )
 
-
-
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
 
 def _sample(X, y, n=500, seed=42):
     """Randomly sample n rows for SHAP (faster, still representative)."""
@@ -69,9 +53,6 @@ def _print_shap(name: str, shap_dict: dict):
         print(f"    {feat:20s} {bar} {val:.4f}")
 
 
-# ---------------------------------------------------------------------------
-# Per-model analysis
-# ---------------------------------------------------------------------------
 
 def explain_random_forest():
     import shap
@@ -116,13 +97,12 @@ def explain_failure_predictor():
         X_s = scaler.transform(X_s)
 
     if hasattr(model, "estimators_"):
-        # Tree-based — fast
+        
         explainer   = shap.TreeExplainer(model)
         shap_values = explainer.shap_values(X_s)
         if isinstance(shap_values, list):
             shap_values = shap_values[1]  # positive class
     else:
-        # Fallback: KernelExplainer (slower)
         background  = shap.sample(X_s, 50)
         explainer   = shap.KernelExplainer(model.predict_proba, background)
         shap_values = explainer.shap_values(X_s, nsamples=50)
@@ -164,13 +144,9 @@ def explain_imitation():
     return result
 
 
-# ---------------------------------------------------------------------------
-# Entry point
-# ---------------------------------------------------------------------------
-
 def run_all():
     print("\n" + "="*60)
-    print("  XAI — SHAP Explainability Analysis")
+    print("  SHAP Explainability Analysis")
     print("="*60)
 
     results = {}

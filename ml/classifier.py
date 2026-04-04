@@ -1,17 +1,5 @@
-"""
-ml/classifier.py — Option 2: Classical ML Classifier Comparison
-
-Trains Random Forest, Gradient Boosting, and Logistic Regression.
-Uses a stratified SAMPLE for GridSearchCV (fast), then refits on the
-full training set for final accuracy reporting.
-
-Why sampling works: 50k balanced samples give the same hyperparameter
-ranking as 3.6M rows at 1/70th the compute cost. Final accuracy is
-evaluated on the full held-out test set — no cheating.
-
-Run:
-    python -m ml.classifier
-"""
+# classifier.py —> Train and compare classical ML classifiers to predict snake actions from state features.
+# Run: python -m ml.classifier
 
 import os, sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -61,18 +49,18 @@ def train(log_mlflow: bool = True):
     n_total = len(X_full)
     print(f"\n  Full dataset   : {n_total:,} samples")
 
-    # Stratified sample — used only for GridSearchCV hyperparameter search
+    # Stratified sample for GridSearchCV
     sample_size = min(getattr(C, 'CLASSIFIER_SAMPLE_SIZE', 50_000), n_total)
     rng = np.random.default_rng(C.CLASSIFIER_RANDOM_STATE)
     idx = rng.choice(n_total, size=sample_size, replace=False)
     X_samp, y_samp = X_full[idx], y_enc_full[idx]
 
-    # Full train/test split — used for final accuracy reporting
+    # Full train/test split
     X_train, X_test, y_train, y_test = train_test_split(
         X_full, y_enc_full, test_size=0.2,
         random_state=C.CLASSIFIER_RANDOM_STATE, stratify=y_enc_full,
     )
-    # Sample train/test split — used for GridSearchCV only
+    # Sample train/test split 
     X_str, _, y_str, _ = train_test_split(
         X_samp, y_samp, test_size=0.2,
         random_state=C.CLASSIFIER_RANDOM_STATE, stratify=y_samp,
@@ -132,14 +120,14 @@ def train(log_mlflow: bool = True):
     print("  Model comparison (sorted by test accuracy):")
     print(results_df.to_string(index=False))
 
-    # Feature importances — RF
+    # Feature importances 
     rf     = best_models["RandomForest"][0]
     imps   = rf.feature_importances_
     print("\n  Random Forest feature importances:")
     for feat, imp in sorted(zip(STATE_FEATURES, imps), key=lambda x: x[1], reverse=True):
         print(f"    {feat:20s} {'█'*int(imp*50)} {imp:.4f}")
 
-    # Classification report — best model
+    # Classification report 
     best_name = results_df.iloc[0]["model"]
     best_est, best_sc = best_models[best_name]
     Xte_b = X_test_sc if best_sc else X_test

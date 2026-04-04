@@ -1,13 +1,6 @@
-"""
-ml/anomaly_detector.py — Option 6: Anomaly Detection + Drift Monitoring
-
-Uses Isolation Forest to profile each agent's normal behaviour.
-Flags anomalous episodes. Computes rolling score window for drift detection.
-
-Run:
-    python -m ml.anomaly_detector
-"""
-
+# anomaly_detector.py —> Train Isolation Forest models to detect anomalous episodes and monitor for performance drift.
+# Run:
+#  python -m ml.anomaly_detector
 import os, sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -32,7 +25,7 @@ def train(log_mlflow: bool = True):
     scaler = StandardScaler()
     X_s    = scaler.fit_transform(X)
 
-    # ── Per-agent Isolation Forest ────────────────────────────────────────
+    
     agents   = df["agent"].unique()
     models   = {}
     all_scores = []
@@ -75,7 +68,7 @@ def train(log_mlflow: bool = True):
 
         models[agent] = iso
 
-    # ── Drift detection ───────────────────────────────────────────────────
+    
     print("\n\n  Drift detection (rolling window analysis):")
     drift_results = []
 
@@ -113,7 +106,7 @@ def train(log_mlflow: bool = True):
     if not drift_df.empty and not drift_df["drift_alert"].any():
         print("  No drift detected across all agent/maze combinations.")
 
-    # ── Save ──────────────────────────────────────────────────────────────
+   
     out_path = os.path.join(C.DATA_DIR, "episode_anomaly.csv")
     df.to_csv(out_path, index=False)
     print(f"\n  Anomaly data saved → {out_path}")

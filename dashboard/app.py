@@ -1,5 +1,5 @@
 """
-dashboard/app.py — Neuro-Sentinel Snake: ML Analytics Dashboard
+dashboard/app.py —> Neuro-Sentinel Snake: ML Analytics Dashboard
 
 Launch:
     python main.py --mode dashboard
@@ -20,20 +20,12 @@ import plotly.express as px
 import plotly.graph_objects as go
 import config as C
 
-# ---------------------------------------------------------------------------
-# Page config
-# ---------------------------------------------------------------------------
-
 st.set_page_config(
     page_title=C.DASHBOARD_TITLE,
     page_icon="🐍",
     layout="wide",
     initial_sidebar_state="expanded",
 )
-
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
 
 @st.cache_data(ttl=30)
 def load_episode_stats():
@@ -106,9 +98,6 @@ AGENT_COLORS = {
     "BreadthFirst":   "#569cd6",
 }
 
-# ---------------------------------------------------------------------------
-# Sidebar
-# ---------------------------------------------------------------------------
 
 st.sidebar.image("https://raw.githubusercontent.com/twitter/twemoji/master/assets/svg/1f40d.svg",
                  width=48)
@@ -138,9 +127,6 @@ st.sidebar.markdown(
     "```"
 )
 
-# ---------------------------------------------------------------------------
-# Page: Overview
-# ---------------------------------------------------------------------------
 
 if page == "Overview":
     st.title("🐍 Neuro-Sentinel Snake")
@@ -186,9 +172,6 @@ if page == "Overview":
         fig.update_layout(showlegend=False, plot_bgcolor="rgba(0,0,0,0)")
         st.plotly_chart(fig, use_container_width=True)
 
-# ---------------------------------------------------------------------------
-# Page: Benchmark Results
-# ---------------------------------------------------------------------------
 
 elif page == "Benchmark Results":
     st.title("📊 Benchmark Results")
@@ -214,7 +197,6 @@ elif page == "Benchmark Results":
 
     st.divider()
 
-    # Per-maze breakdown
     st.subheader("Average score per agent per maze")
     pivot = ep.groupby(["maze","agent"])["final_score"].mean().reset_index()
     fig = px.bar(
@@ -226,7 +208,6 @@ elif page == "Benchmark Results":
     fig.update_layout(plot_bgcolor="rgba(0,0,0,0)")
     st.plotly_chart(fig, use_container_width=True)
 
-    # Death rate heatmap
     st.subheader("Death rate heatmap (agent × maze)")
     heat = ep.groupby(["agent","maze"])["died"].mean().reset_index()
     heat_pivot = heat.pivot(index="agent", columns="maze", values="died")
@@ -238,7 +219,6 @@ elif page == "Benchmark Results":
     fig2.update_layout(plot_bgcolor="rgba(0,0,0,0)")
     st.plotly_chart(fig2, use_container_width=True)
 
-    # Path optimality
     st.subheader("Path optimality (1.0 = perfect)")
     opt = ep.groupby(["agent","maze"])["path_optimality"].mean().reset_index()
     fig3 = px.bar(
@@ -251,7 +231,6 @@ elif page == "Benchmark Results":
     fig3.update_layout(plot_bgcolor="rgba(0,0,0,0)")
     st.plotly_chart(fig3, use_container_width=True)
 
-    # ── Confusion Matrix ───────────────────────────────────────────────
     st.divider()
     st.subheader("Confusion matrix → ML classifier vs actual actions")
     st.markdown(
@@ -272,7 +251,6 @@ elif page == "Benchmark Results":
             _X, _y, _ = get_classifier_data()
             _y_enc = encode_actions(_y)
 
-            # Use a 10k sample for speed — confusion matrix doesn't need full data
             import numpy as np
             _rng = np.random.default_rng(42)
             _idx = _rng.choice(len(_X), size=min(10_000, len(_X)), replace=False)
@@ -304,8 +282,6 @@ elif page == "Benchmark Results":
             st.info(f"Confusion matrix unavailable: {_e}")
     else:
         st.info("Train the classifier first: `python main.py --mode train`")
-
-    # ── Imitation Learning accuracy ────────────────────────────────────
     st.divider()
     st.subheader("Imitation Learning → Covariate Shift Analysis")
     if os.path.exists(C.IMITATION_MODEL_PATH):
@@ -346,16 +322,13 @@ elif page == "Benchmark Results":
                 f"but only **{_te_acc:.1%}** on unseen mazes. "
                 f"This **{(_tr_acc-_te_acc):.1%} covariate shift** demonstrates a core ML "
                 f"concept: a model that memorises expert demonstrations without generalising "
-                f"fails when the environment changes — even when the expert (A*) would still succeed."
+                f"fails when the environment changes —> even when the expert (A*) would still succeed."
             )
         except Exception as _e:
             st.info(f"Imitation analysis unavailable: {_e}")
     else:
         st.info("Train the imitation model first: `python main.py --mode train`")
 
-# ---------------------------------------------------------------------------
-# Page: Behaviour Clustering
-# ---------------------------------------------------------------------------
 
 elif page == "Behaviour Clustering":
     st.title("🔵 Behaviour Clustering")
@@ -369,7 +342,6 @@ elif page == "Behaviour Clustering":
         _not_ready("Clustering data")
         st.stop()
 
-    # t-SNE scatter
     st.subheader("t-SNE: agent behavioral profiles")
     fig = px.scatter(
         cl, x="tsne_x", y="tsne_y",
@@ -382,7 +354,6 @@ elif page == "Behaviour Clustering":
     fig.update_layout(plot_bgcolor="rgba(0,0,0,0)")
     st.plotly_chart(fig, use_container_width=True)
 
-    # Cluster composition
     st.subheader("Cluster composition")
     comp = cl.groupby(["cluster","agent"]).size().reset_index(name="count")
     fig2 = px.bar(
@@ -393,15 +364,11 @@ elif page == "Behaviour Clustering":
     fig2.update_layout(plot_bgcolor="rgba(0,0,0,0)")
     st.plotly_chart(fig2, use_container_width=True)
 
-    # Cluster mean stats
     st.subheader("Cluster feature means")
     from ml.features import EPISODE_FEATURES
     means = cl.groupby("cluster")[EPISODE_FEATURES].mean().round(3)
     st.dataframe(means, use_container_width=True)
 
-# ---------------------------------------------------------------------------
-# Page: Failure Prediction
-# ---------------------------------------------------------------------------
 
 elif page == "Failure Prediction":
     st.title("⚠️ Failure Prediction")
@@ -456,7 +423,6 @@ elif page == "Failure Prediction":
             )
             st.plotly_chart(fig2, use_container_width=True)
 
-    # Live danger simulator
     st.divider()
     st.subheader("🔴 Live danger simulator")
     st.markdown("Adjust the state features and see the predicted failure probability in real time.")
@@ -499,9 +465,6 @@ elif page == "Failure Prediction":
     except Exception as e:
         st.warning(f"Cannot run live predictor: {e}")
 
-# ---------------------------------------------------------------------------
-# Page: Anomaly & Drift
-# ---------------------------------------------------------------------------
 
 elif page == "Anomaly & Drift":
     st.title("🔍 Anomaly Detection & Drift Monitoring")
@@ -513,7 +476,7 @@ elif page == "Anomaly & Drift":
         _not_ready("Anomaly detection data")
         st.stop()
 
-    # Anomaly score timeline
+
     st.subheader("Anomaly scores by agent (lower = more anomalous)")
     fig = px.box(
         an, x="agent", y="anomaly_score", color="agent",
@@ -523,7 +486,6 @@ elif page == "Anomaly & Drift":
     fig.update_layout(showlegend=False, plot_bgcolor="rgba(0,0,0,0)")
     st.plotly_chart(fig, use_container_width=True)
 
-    # Anomalous episodes table
     st.subheader("Most anomalous episodes")
     worst = an.nsmallest(20, "anomaly_score")[
         ["episode_id", "agent", "maze", "final_score",
@@ -531,7 +493,6 @@ elif page == "Anomaly & Drift":
     ].round(4)
     st.dataframe(worst, use_container_width=True)
 
-    # Drift report
     st.divider()
     st.subheader("📉 Drift report")
     if dr is None or dr.empty:
@@ -539,7 +500,7 @@ elif page == "Anomaly & Drift":
     else:
         alerts = dr[dr["drift_alert"] == True]
         if alerts.empty:
-            st.success("✅ No performance drift detected across any agent/maze combination.")
+            st.success(" No performance drift detected across any agent/maze combination.")
         else:
             st.error(f"⚠ {len(alerts)} drift alert(s) detected!")
             st.dataframe(alerts, use_container_width=True)
@@ -563,9 +524,6 @@ elif page == "Anomaly & Drift":
         )
         st.plotly_chart(fig2, use_container_width=True)
 
-# ---------------------------------------------------------------------------
-# Page: Explainability (XAI)
-# ---------------------------------------------------------------------------
 
 elif page == "Explainability (XAI)":
     st.title("🧠 Explainability → SHAP Analysis")
@@ -609,9 +567,6 @@ elif page == "Explainability (XAI)":
         st.plotly_chart(fig, use_container_width=True)
         st.divider()
 
-# ---------------------------------------------------------------------------
-# Page: Maze Difficulty
-# ---------------------------------------------------------------------------
 
 elif page == "Maze Difficulty":
     st.title("🗺️ Maze Difficulty Analysis")
@@ -656,10 +611,6 @@ elif page == "Maze Difficulty":
     fig2.update_traces(textposition="top center")
     fig2.update_layout(plot_bgcolor="rgba(0,0,0,0)")
     st.plotly_chart(fig2, use_container_width=True)
-
-# ---------------------------------------------------------------------------
-# Page: Raw Data Explorer
-# ---------------------------------------------------------------------------
 
 elif page == "Raw Data Explorer":
     st.title("🗄️ Raw Data Explorer")

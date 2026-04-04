@@ -1,12 +1,5 @@
-"""
-ml/imitation.py — Option 1: Imitation Learning (Behavioural Cloning)
-
-Trains an MLP classifier to imitate A* by learning from its demonstrations.
-Evaluates on held-out mazes to expose covariate shift / distribution shift.
-
-Run:
-    python -m ml.imitation
-"""
+# imitation.py —> Option 1: Imitation Learning (Behavioural Cloning)
+# Run:  python -m ml.imitation
 
 import os, sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -27,16 +20,12 @@ from sklearn.metrics import (
 from sklearn.preprocessing import StandardScaler
 
 
-# ---------------------------------------------------------------------------
-# Training
-# ---------------------------------------------------------------------------
-
 def train(log_mlflow: bool = True):
     print("\n" + "="*60)
     print("  Option 1 — Imitation Learning (Behavioural Cloning)")
     print("="*60)
 
-    # Load data — exclude held-out mazes for honest eval
+    # Load data
     X_train_full, y_train_full, df_train = get_imitation_data(
         agent=C.IMITATION_TRAIN_AGENT,
         exclude_mazes=C.IMITATION_TEST_MAZES,
@@ -49,7 +38,7 @@ def train(log_mlflow: bool = True):
     X_test = X_test_full[mask]
     y_test = y_test_full[mask]
 
-    # Sample training data — MLP converges well at 100k; 1.2M just wastes time
+    # Sample training data if needed (MLP can be slow on large datasets)
     train_sample = min(100_000, len(X_train_full))
     rng = np.random.default_rng(C.IMITATION_RANDOM_STATE)
     idx = rng.choice(len(X_train_full), size=train_sample, replace=False)
@@ -141,11 +130,6 @@ def train(log_mlflow: bool = True):
         "scaler":          scaler,
     }
 
-
-# ---------------------------------------------------------------------------
-# Inference helper (used by dashboard)
-# ---------------------------------------------------------------------------
-
 def predict_action(state_vector: list) -> int:
     """Given an 11-dim state vector, return predicted action code."""
     with open(C.IMITATION_MODEL_PATH, "rb") as f:
@@ -155,10 +139,6 @@ def predict_action(state_vector: list) -> int:
     enc = mlp.predict(X)[0]
     return decode_actions(np.array([enc]))[0]
 
-
-# ---------------------------------------------------------------------------
-# Permutation importance (no extra dependency)
-# ---------------------------------------------------------------------------
 
 def _permutation_importance(model, X, y, n_repeats: int = 5) -> np.ndarray:
     base_score = accuracy_score(y, model.predict(X))
@@ -177,9 +157,6 @@ def _permutation_importance(model, X, y, n_repeats: int = 5) -> np.ndarray:
     return importances / total if total > 0 else importances
 
 
-# ---------------------------------------------------------------------------
-# Entry point
-# ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
     train()

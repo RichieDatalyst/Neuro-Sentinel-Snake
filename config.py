@@ -1,13 +1,7 @@
-"""
-config.py — Single source of truth for all project settings.
-Every other file imports from here. Nothing is hardcoded anywhere else.
-"""
+# config.py —> Centralized configuration for the Neuro-Sentinel Snake project.
 
 import os
 
-# ---------------------------------------------------------------------------
-# Paths
-# ---------------------------------------------------------------------------
 BASE_DIR        = os.path.dirname(os.path.abspath(__file__))
 MAZES_DIR       = os.path.join(BASE_DIR, "mazes")
 DATA_DIR        = os.path.join(BASE_DIR, "data")
@@ -23,9 +17,7 @@ MAZE_FEATURES_PATH = os.path.join(DATA_DIR, "maze_features.csv")
 for _dir in [DATA_DIR, MODELS_DIR, EXPERIMENTS_DIR]:
     os.makedirs(_dir, exist_ok=True)
 
-# ---------------------------------------------------------------------------
-# Simulation settings
-# ---------------------------------------------------------------------------
+# Snake agent and maze settings
 AGENTS = ["AStar", "GreedyBestFirst", "BreadthFirst"]
 
 MAZES = [
@@ -44,10 +36,8 @@ SNAKE_DIR_X             = 0
 SNAKE_DIR_Y             = 1
 SNAKE_COLOR             = "red"
 
-# ---------------------------------------------------------------------------
-# Feature engineering
-# ---------------------------------------------------------------------------
-# Columns written to game_log.csv for every step
+# Food reward is +1 per food, death penalty is -100, step penalty is -0.01
+# This encourages the snake to find food quickly without taking too long.
 GAME_LOG_COLUMNS = [
     "episode_id",       # unique int across entire run
     "agent",            # AStar | GreedyBestFirst | BreadthFirst
@@ -64,7 +54,7 @@ GAME_LOG_COLUMNS = [
     "died_next_10",     # 1 if snake died within 10 steps — label for Opt 5
 ]
 
-# Columns written to episode_stats.csv — one row per episode
+# Columns written to episode_stats.csv —> one row per episode
 EPISODE_STATS_COLUMNS = [
     "episode_id",
     "agent",
@@ -80,9 +70,7 @@ EPISODE_STATS_COLUMNS = [
     "steps_per_food",    # total_steps / max(foods_eaten,1)
 ]
 
-# ---------------------------------------------------------------------------
-# ML — Option 1: Imitation Learning (MLP)
-# ---------------------------------------------------------------------------
+# MLflow experiment tracking
 IMITATION_TEST_MAZES   = ["Maze4_hard.txt", "Maze5_dense.txt"]  # held-out mazes
 IMITATION_TRAIN_AGENT  = "AStar"        # we imitate A*
 IMITATION_HIDDEN_SIZES = (128, 64)      # MLP hidden layer sizes
@@ -90,20 +78,18 @@ IMITATION_MAX_ITER     = 500
 IMITATION_RANDOM_STATE = 42
 IMITATION_MODEL_PATH   = os.path.join(MODELS_DIR, "imitation_mlp.pkl")
 
-# ---------------------------------------------------------------------------
-# ML — Option 2: Classical ML Classifiers
-# ---------------------------------------------------------------------------
+# Opt 2 classifier settings
 CLASSIFIER_MODELS = ["RandomForest", "GradientBoosting", "LogisticRegression"]
 CLASSIFIER_CV_FOLDS     = 3             # 3-fold is sufficient; 5-fold triples the time
 CLASSIFIER_RANDOM_STATE = 42
 CLASSIFIER_MODEL_PATH   = os.path.join(MODELS_DIR, "rf_classifier.pkl")
 
-# Max rows fed to GridSearchCV — 50k is statistically equivalent to 3.6M
+# Max rows fed to GridSearchCV —> 50k is statistically equivalent to 3.6M
 # and reduces training from hours to minutes with identical accuracy
 CLASSIFIER_SAMPLE_SIZE  = 50_000
 FAILURE_SAMPLE_SIZE     = 80_000       # failure predictor also sampled
 
-# Lean param grids — one or two values per hyperparameter is enough
+# Lean param grids —> one or two values per hyperparameter is enough
 RF_PARAM_GRID = {
     "n_estimators": [100, 200],
     "max_depth":    [10, 20],
@@ -119,54 +105,38 @@ LR_PARAM_GRID = {
     "C": [0.1, 1.0, 10.0],
 }
 
-# ---------------------------------------------------------------------------
-# ML — Option 3: Maze Difficulty Regression
-# ---------------------------------------------------------------------------
+# Opt 3 maze difficulty regression settings
 MAZE_DIFFICULTY_MODEL_PATH = os.path.join(MODELS_DIR, "maze_difficulty.pkl")
 
-# ---------------------------------------------------------------------------
-# ML — Option 4: Behaviour Clustering
-# ---------------------------------------------------------------------------
+# option 4 clustering settings
 CLUSTERING_K_RANGE      = range(2, 8)   # k values to try for elbow method
 CLUSTERING_RANDOM_STATE = 42
 TSNE_PERPLEXITY         = 15
 TSNE_RANDOM_STATE       = 42
 
-# ---------------------------------------------------------------------------
-# ML — Option 5: Failure Prediction
-# ---------------------------------------------------------------------------
+# Opt 5 failure prediction settings
 FAILURE_LOOKAHEAD_STEPS   = 10          # "will die in next N steps"
 FAILURE_TEST_SIZE         = 0.2
 FAILURE_RANDOM_STATE      = 42
 FAILURE_ALERT_THRESHOLD   = 0.70        # probability above which we show alert
 FAILURE_MODEL_PATH        = os.path.join(MODELS_DIR, "failure_predictor.pkl")
 
-# ---------------------------------------------------------------------------
-# ML — Option 6: Anomaly Detection
-# ---------------------------------------------------------------------------
+# Opt 6 anomaly detection settings
 ANOMALY_CONTAMINATION  = 0.05          # expected fraction of anomalous episodes
 ANOMALY_RANDOM_STATE   = 42
 ANOMALY_MODEL_PATH     = os.path.join(MODELS_DIR, "anomaly_detector.pkl")
 ANOMALY_DRIFT_WINDOW   = 10            # rolling window for drift detection
 ANOMALY_DRIFT_DROP     = 0.30          # 30% score drop triggers alert
 
-# ---------------------------------------------------------------------------
-# MLflow experiment tracking
-# ---------------------------------------------------------------------------
-# On Windows, os.path.join gives "D:\\path" which MLflow reads as scheme "D".
-# Prefixing with file:/// fixes this on all platforms.
+# MLflow settings
 _mlflow_local_path  = os.path.join(EXPERIMENTS_DIR, "mlflow_runs")
 MLFLOW_TRACKING_URI = "file:///" + _mlflow_local_path.replace("\\", "/")
 MLFLOW_EXPERIMENT_NAME = "neuro-sentinel-snake"
 
-# ---------------------------------------------------------------------------
-# Dashboard (Streamlit)
-# ---------------------------------------------------------------------------
-DASHBOARD_TITLE         = "Neuro-Sentinel Snake — ML Analytics Dashboard"
+# Dashboard settings
+DASHBOARD_TITLE         = "Neuro-Sentinel Snake → ML Analytics Dashboard"
 DASHBOARD_REFRESH_SECS  = 5
 
-# ---------------------------------------------------------------------------
-# Gameplay (Tkinter)
-# ---------------------------------------------------------------------------
+# Game settings
 SNAKE_SPEED             = 30
 UNIT_SIZE               = 10

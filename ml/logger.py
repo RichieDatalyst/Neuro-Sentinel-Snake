@@ -1,14 +1,5 @@
-"""
-ml/logger.py — Unified data collection engine.
-
-Runs every agent on every maze for N episodes (headless — no GUI).
-Writes two CSVs that every ML module reads from:
-  - data/game_log.csv      : one row per step
-  - data/episode_stats.csv : one row per episode
-
-Run directly:
-    python -m ml.logger
-"""
+# logger.py —> Main simulation loop and logging for training data collection.
+# Run:  python -m ml.logger
 
 import os
 import sys
@@ -22,10 +13,6 @@ import config as C
 from core.State      import SnakeState
 from core.agentsnake import AgentSnake
 
-
-# ---------------------------------------------------------------------------
-# Direction helpers
-# ---------------------------------------------------------------------------
 
 ACTION_TO_DIR = {
     0: (0, -1),   # Up
@@ -41,20 +28,14 @@ def _set_direction(state: SnakeState, action: int):
     state.snake.HeadDirection.Y = dy
 
 
-# ---------------------------------------------------------------------------
-# Single-episode runner
-# ---------------------------------------------------------------------------
-
 def run_episode(agent_name: str, maze_filename: str,
                 episode_id: int, step_rows: list, episode_rows: list):
     """
-    Play one full game headlessly.
-    Appends step-level rows to step_rows and one episode row to episode_rows.
-    Returns nothing — caller owns the lists.
+    Run a single episode of the given agent on the given maze.
+    Appends step-level data to step_rows and episode-level summary to episode_rows.
     """
     maze_path = os.path.join(C.MAZES_DIR, maze_filename)
 
-    # Clear error before the cryptic unpack crash
     if not os.path.exists(maze_path):
         raise FileNotFoundError(
             f"\nMaze file not found: {maze_path}"
@@ -78,7 +59,6 @@ def run_episode(agent_name: str, maze_filename: str,
     prev_action       = None
     plan_good         = True
 
-    # We collect per-step data first, then back-fill died_next_10
     episode_steps = []
 
     while state.snake.isAlive and plan_good and step_count < C.MAX_STEPS_PER_EPISODE:
@@ -93,12 +73,12 @@ def run_episode(agent_name: str, maze_filename: str,
             if step_count >= C.MAX_STEPS_PER_EPISODE:
                 break
 
-            # Capture state BEFORE the move
+            
             sd = state.get_state_dict()
             prev_dist = (abs(state.FoodPosition.X - state.snake.HeadPosition.X) +
                          abs(state.FoodPosition.Y - state.snake.HeadPosition.Y))
 
-            # Direction change tracking
+            
             if prev_action is not None and action != prev_action:
                 direction_changes += 1
             prev_action = action
@@ -114,7 +94,7 @@ def run_episode(agent_name: str, maze_filename: str,
             if going_into_danger:
                 dead_end_entries += 1
 
-            # Execute move
+            
             _set_direction(state, action)
             state.snake.moveSnake(state)
             step_count += 1
@@ -128,7 +108,7 @@ def run_episode(agent_name: str, maze_filename: str,
                 **sd,
                 "score":         state.snake.score,
                 "action":        action,
-                "died_next_10":  0,  # placeholder — back-filled below
+                "died_next_10":  0,  
             }
             episode_steps.append(row)
 
@@ -171,14 +151,10 @@ def run_episode(agent_name: str, maze_filename: str,
     })
 
 
-# ---------------------------------------------------------------------------
-# Main simulation loop
-# ---------------------------------------------------------------------------
-
 def run_simulation(episodes_per_combo: int = None, verbose: bool = True):
     """
-    Run all agents × all mazes × N episodes.
-    Writes game_log.csv and episode_stats.csv.
+    Run the full simulation across all agents and mazes, collecting step-level and episode-level data.
+    Returns two lists of dicts: step_rows and episode_rows.
     """
     n = episodes_per_combo or C.EPISODES_PER_AGENT_MAZE
 
@@ -243,10 +219,6 @@ def run_simulation(episodes_per_combo: int = None, verbose: bool = True):
 
     return step_rows, episode_rows
 
-
-# ---------------------------------------------------------------------------
-# Entry point
-# ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
     run_simulation()

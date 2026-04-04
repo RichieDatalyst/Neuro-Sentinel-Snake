@@ -1,4 +1,4 @@
-"""core/breadthfirst.py — BFS search agent."""
+"""BFS search agent."""
 
 from collections import deque
 

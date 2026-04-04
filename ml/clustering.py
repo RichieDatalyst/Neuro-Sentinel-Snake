@@ -1,12 +1,5 @@
-"""
-ml/clustering.py — Option 4: Unsupervised Behaviour Clustering
-
-Clusters agents by their behavioral telemetry using K-Means.
-Visualises with t-SNE. Produces the most visually striking output.
-
-Run:
-    python -m ml.clustering
-"""
+# clustering.py —> Train K-Means clustering to identify behaviour clusters. Use t-SNE for 2D visualization.
+# Run:  python -m ml.clustering
 
 import os, sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -34,7 +27,7 @@ def train(log_mlflow: bool = True):
     scaler = StandardScaler()
     X_s    = scaler.fit_transform(X)
 
-    # ── Elbow + Silhouette to find optimal k ──────────────────────────────
+    
     print("\n  Finding optimal k (elbow + silhouette):")
     inertias    = []
     sil_scores  = []
@@ -52,7 +45,7 @@ def train(log_mlflow: bool = True):
     best_k = k_range[int(np.argmax(sil_scores))]
     print(f"\n  Best k = {best_k}  (highest silhouette score)")
 
-    # ── Final clustering ──────────────────────────────────────────────────
+    
     km_final = KMeans(n_clusters=best_k, random_state=C.CLUSTERING_RANDOM_STATE,
                       n_init=10)
     df["cluster"] = km_final.fit_predict(X_s)
@@ -69,7 +62,7 @@ def train(log_mlflow: bool = True):
     centroids_df.index.name = "cluster"
     print(centroids_df.to_string())
 
-    # ── t-SNE for 2D visualisation ─────────────────────────────────────
+    
     print("\n  Running t-SNE (this takes ~10–30s)...")
     perp = min(C.TSNE_PERPLEXITY, len(X_s) - 1)
     tsne = TSNE(n_components=2, perplexity=perp,
@@ -112,7 +105,7 @@ def train(log_mlflow: bool = True):
                 mlflow.log_metric("silhouette_score", round(max(sil_scores), 4))
             print("  MLflow run logged.")
         except ImportError:
-            print("  MLflow not installed — skipping. Run: pip install mlflow")
+            print("  MLflow not installed —> skipping. Run: pip install mlflow")
 
     return df, km_final, artifacts
 

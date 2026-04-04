@@ -1,4 +1,4 @@
-"""core/astar.py — A* search agent (unchanged algorithm, clean package)."""
+""" A* search agent."""
 
 import heapq
 
