@@ -9,7 +9,6 @@ env/
 
 # Data files — too large for git
 data/game_log.csv
-data/episode_stats.csv
 
 # Keep these small derived files
 !data/episode_stats.csv
@@ -19,7 +18,7 @@ data/episode_stats.csv
 !data/drift_report.csv
 
 # Trained models — regenerate with: python main.py --mode train
-models/
+!models/
 
 # MLflow runs
 experiments/
