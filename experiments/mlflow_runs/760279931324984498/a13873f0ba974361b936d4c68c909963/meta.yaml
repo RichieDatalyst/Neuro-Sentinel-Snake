@@ -1,0 +1,14 @@
+artifact_uri: file:///D:/neuro-sentinel-snake/experiments/mlflow_runs/760279931324984498/a13873f0ba974361b936d4c68c909963/artifacts
+end_time: 1775309932625
+entry_point_name: ''
+experiment_id: '760279931324984498'
+lifecycle_stage: active
+run_id: a13873f0ba974361b936d4c68c909963
+run_name: behaviour_clustering
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1775309932577
+status: 3
+tags: []
+user_id: Ameer Abdullah

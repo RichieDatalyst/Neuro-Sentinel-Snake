@@ -1,0 +1,14 @@
+artifact_uri: file:///D:/neuro-sentinel-snake/experiments/mlflow_runs/760279931324984498/464cc01c9de543afaaae6df5c9f8fb01/artifacts
+end_time: 1775313663783
+entry_point_name: ''
+experiment_id: '760279931324984498'
+lifecycle_stage: active
+run_id: 464cc01c9de543afaaae6df5c9f8fb01
+run_name: imitation_learning
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1775313653533
+status: 3
+tags: []
+user_id: Ameer Abdullah

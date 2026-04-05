@@ -1,0 +1,14 @@
+artifact_uri: file:///D:/neuro-sentinel-snake/experiments/mlflow_runs/760279931324984498/0913fac8c14f4828a2b3da85d9e6f005/artifacts
+end_time: 1775318250205
+entry_point_name: ''
+experiment_id: '760279931324984498'
+lifecycle_stage: active
+run_id: 0913fac8c14f4828a2b3da85d9e6f005
+run_name: classifier_LogisticRegression
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1775318250173
+status: 3
+tags: []
+user_id: Ameer Abdullah

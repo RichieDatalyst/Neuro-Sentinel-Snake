@@ -1,0 +1,14 @@
+artifact_uri: file:///D:/neuro-sentinel-snake/experiments/mlflow_runs/760279931324984498/77048df0b61d4b3fb4378040fe398082/artifacts
+end_time: 1775318250080
+entry_point_name: ''
+experiment_id: '760279931324984498'
+lifecycle_stage: active
+run_id: 77048df0b61d4b3fb4378040fe398082
+run_name: classifier_RandomForest
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1775318250022
+status: 3
+tags: []
+user_id: Ameer Abdullah

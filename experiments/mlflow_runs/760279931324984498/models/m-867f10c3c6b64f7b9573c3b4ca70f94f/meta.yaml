@@ -1,0 +1,10 @@
+artifact_location: file:///D:/neuro-sentinel-snake/experiments/mlflow_runs/760279931324984498/models/m-867f10c3c6b64f7b9573c3b4ca70f94f/artifacts
+creation_timestamp: 1775313653623
+experiment_id: '760279931324984498'
+last_updated_timestamp: 1775313663783
+model_id: m-867f10c3c6b64f7b9573c3b4ca70f94f
+model_type: null
+name: imitation_mlp
+source_run_id: 464cc01c9de543afaaae6df5c9f8fb01
+status: 2
+status_message: null

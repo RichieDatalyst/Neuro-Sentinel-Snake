@@ -1,0 +1,14 @@
+artifact_uri: file:///D:/neuro-sentinel-snake/experiments/mlflow_runs/760279931324984498/e25d3df7c8444a4f93c8e1548cdd5a4f/artifacts
+end_time: 1775318250142
+entry_point_name: ''
+experiment_id: '760279931324984498'
+lifecycle_stage: active
+run_id: e25d3df7c8444a4f93c8e1548cdd5a4f
+run_name: classifier_GradientBoosting
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1775318250111
+status: 3
+tags: []
+user_id: Ameer Abdullah

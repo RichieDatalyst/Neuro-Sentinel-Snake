@@ -1,0 +1,14 @@
+artifact_uri: file:///D:/neuro-sentinel-snake/experiments/mlflow_runs/760279931324984498/8752283a800e45c5aa75baa3314ab7a2/artifacts
+end_time: 1775309907046
+entry_point_name: ''
+experiment_id: '760279931324984498'
+lifecycle_stage: active
+run_id: 8752283a800e45c5aa75baa3314ab7a2
+run_name: maze_difficulty_regression
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1775309906983
+status: 3
+tags: []
+user_id: Ameer Abdullah
