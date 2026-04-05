@@ -43,7 +43,6 @@ neuro-sentinel-snake/
 ├── dashboard/app.py         # 8-page Streamlit analytics dashboard
 ├── main.py                  # CLI entry point
 ├── config.py                # All hyperparameters in one place
-├── Dockerfile
 └── requirements.txt
 ```
 
@@ -276,32 +275,6 @@ pip install pytest
 python -m pytest tests/ -v
 ```
 
----
-
-## Docker
-
-### Build and Run
-```bash
-# Build image
-docker build -t neuro-sentinel-snake .
-
-# Run full pipeline + dashboard (headless)
-docker run -p 8501:8501 neuro-sentinel-snake
-
-# Open http://localhost:8501
-```
-
-### Run Individual Modes
-```bash
-# Simulate only
-docker run neuro-sentinel-snake python main.py --mode simulate
-
-# Train only (after simulate)
-docker run neuro-sentinel-snake python main.py --mode train
-```
-
----
-
 ## GitHub Setup
 
 ```bash
@@ -327,7 +300,7 @@ git push -u origin main
 - All source code
 - 5 maze `.txt` files
 - Small derived data files (`shap_*.json`, `maze_features.csv`, `drift_report.csv`, `clustering_artifacts.json`)
-- `requirements.txt`, `Dockerfile`, `config.py`
+- `requirements.txt`, `config.py`
 
 ### GitHub Actions CI
 The CI pipeline at `.github/workflows/ci.yml` runs automatically on every push:
@@ -377,7 +350,6 @@ IMITATION_TEST_MAZES    = ["Maze4_hard.txt", "Maze5_dense.txt"]  # held-out
 | Experiment tracking | MLflow |
 | Dashboard | Streamlit + Plotly |
 | Gameplay UI | Tkinter |
-| Containerisation | Docker |
 | CI/CD | GitHub Actions |
 | Data | CSV pipeline (no database required) |
 
@@ -415,7 +387,6 @@ neuro-sentinel-snake/
 ├── tests/test_pipeline.py     # Pytest smoke tests
 ├── main.py                    # CLI entry point
 ├── config.py                  # All hyperparameters
-├── Dockerfile
 ├── requirements.txt
 └── README.md
 ```
