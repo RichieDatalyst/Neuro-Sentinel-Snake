@@ -10,7 +10,7 @@ EXPERIMENTS_DIR = os.path.join(BASE_DIR, "experiments")
 
 # Output CSVs (written by logger.py, read by every ML module)
 GAME_LOG_PATH      = os.path.join(DATA_DIR, "game_log.csv")
-GAME_LOG_ZIP_PATH  = os.path.join(DATA_DIR, "game_log.zip")
+GAME_LOG_ZIP_PATH  = os.path.join(DATA_DIR, "game_log.csv.zip")
 EPISODE_STATS_PATH = os.path.join(DATA_DIR, "episode_stats.csv")
 MAZE_FEATURES_PATH = os.path.join(DATA_DIR, "maze_features.csv")
 
