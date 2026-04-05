@@ -12,6 +12,7 @@ data/game_log.csv
 data/episode_stats.csv
 
 # Keep these small derived files
+!data/episode_stats.csv
 !data/maze_features.csv
 !data/clustering_artifacts.json
 !data/shap_*.json
