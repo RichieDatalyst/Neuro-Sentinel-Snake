@@ -21,7 +21,7 @@ data/game_log.csv
 !models/
 
 # MLflow runs
-experiments/
+experiments/mlflow_runs/*/artifacts/
 
 # Streamlit cache
 .streamlit/
