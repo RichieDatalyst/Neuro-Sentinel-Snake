@@ -9,7 +9,8 @@ env/
 
 # Data files — too large for git
 data/game_log.csv
-
+# data/game_log.zip
+ 
 # Keep these small derived files
 !data/episode_stats.csv
 !data/maze_features.csv
@@ -21,7 +22,7 @@ data/game_log.csv
 !models/
 
 # MLflow runs
-experiments/
+experiments/mlflow_runs/*/artifacts/
 
 # Streamlit cache
 .streamlit/

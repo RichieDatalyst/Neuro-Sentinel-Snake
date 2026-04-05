@@ -10,6 +10,7 @@ EXPERIMENTS_DIR = os.path.join(BASE_DIR, "experiments")
 
 # Output CSVs (written by logger.py, read by every ML module)
 GAME_LOG_PATH      = os.path.join(DATA_DIR, "game_log.csv")
+GAME_LOG_ZIP_PATH  = os.path.join(DATA_DIR, "game_log.zip")
 EPISODE_STATS_PATH = os.path.join(DATA_DIR, "episode_stats.csv")
 MAZE_FEATURES_PATH = os.path.join(DATA_DIR, "maze_features.csv")
 
@@ -17,7 +18,6 @@ MAZE_FEATURES_PATH = os.path.join(DATA_DIR, "maze_features.csv")
 for _dir in [DATA_DIR, MODELS_DIR, EXPERIMENTS_DIR]:
     os.makedirs(_dir, exist_ok=True)
 
-# Snake agent and maze settings
 AGENTS = ["AStar", "GreedyBestFirst", "BreadthFirst"]
 
 MAZES = [
@@ -29,15 +29,14 @@ MAZES = [
 ]
 
 EPISODES_PER_AGENT_MAZE = 200   # games each agent plays on each maze
-MAX_STEPS_PER_EPISODE   = 2000  # safety cap — avoids infinite loops
+MAX_STEPS_PER_EPISODE   = 2000  # safety cap avoids infinite loops
 SNAKE_START_X           = 10
 SNAKE_START_Y           = 10
 SNAKE_DIR_X             = 0
 SNAKE_DIR_Y             = 1
 SNAKE_COLOR             = "red"
 
-# Food reward is +1 per food, death penalty is -100, step penalty is -0.01
-# This encourages the snake to find food quickly without taking too long.
+# Columns written to game_log.csv for every step
 GAME_LOG_COLUMNS = [
     "episode_id",       # unique int across entire run
     "agent",            # AStar | GreedyBestFirst | BreadthFirst
@@ -54,7 +53,7 @@ GAME_LOG_COLUMNS = [
     "died_next_10",     # 1 if snake died within 10 steps — label for Opt 5
 ]
 
-# Columns written to episode_stats.csv —> one row per episode
+# Columns written to episode_stats.csv for every episode (aggregated features)
 EPISODE_STATS_COLUMNS = [
     "episode_id",
     "agent",
@@ -64,13 +63,12 @@ EPISODE_STATS_COLUMNS = [
     "foods_eaten",
     "died",             # 1 = hit wall/out of bounds, 0 = ran out of plan
     "avg_dist_to_food",
-    "direction_changes", # how often direction changed — behaviour feature
+    "direction_changes", # how often direction changed behaviour feature
     "dead_end_entries",  # steps where danger_straight=1 and no food ahead
     "path_optimality",   # final_score / max_possible_score proxy
     "steps_per_food",    # total_steps / max(foods_eaten,1)
 ]
 
-# MLflow experiment tracking
 IMITATION_TEST_MAZES   = ["Maze4_hard.txt", "Maze5_dense.txt"]  # held-out mazes
 IMITATION_TRAIN_AGENT  = "AStar"        # we imitate A*
 IMITATION_HIDDEN_SIZES = (128, 64)      # MLP hidden layer sizes
@@ -78,18 +76,16 @@ IMITATION_MAX_ITER     = 500
 IMITATION_RANDOM_STATE = 42
 IMITATION_MODEL_PATH   = os.path.join(MODELS_DIR, "imitation_mlp.pkl")
 
-# Opt 2 classifier settings
 CLASSIFIER_MODELS = ["RandomForest", "GradientBoosting", "LogisticRegression"]
 CLASSIFIER_CV_FOLDS     = 3             # 3-fold is sufficient; 5-fold triples the time
 CLASSIFIER_RANDOM_STATE = 42
 CLASSIFIER_MODEL_PATH   = os.path.join(MODELS_DIR, "rf_classifier.pkl")
 
-# Max rows fed to GridSearchCV —> 50k is statistically equivalent to 3.6M
-# and reduces training from hours to minutes with identical accuracy
+# Use a subset of the data for faster training and tuning 50k rows is enough to get good performance
 CLASSIFIER_SAMPLE_SIZE  = 50_000
 FAILURE_SAMPLE_SIZE     = 80_000       # failure predictor also sampled
 
-# Lean param grids —> one or two values per hyperparameter is enough
+# Lean param grids one or two values per hyperparameter is enough
 RF_PARAM_GRID = {
     "n_estimators": [100, 200],
     "max_depth":    [10, 20],
@@ -105,38 +101,38 @@ LR_PARAM_GRID = {
     "C": [0.1, 1.0, 10.0],
 }
 
-# Opt 3 maze difficulty regression settings
+
 MAZE_DIFFICULTY_MODEL_PATH = os.path.join(MODELS_DIR, "maze_difficulty.pkl")
 
-# option 4 clustering settings
 CLUSTERING_K_RANGE      = range(2, 8)   # k values to try for elbow method
 CLUSTERING_RANDOM_STATE = 42
 TSNE_PERPLEXITY         = 15
 TSNE_RANDOM_STATE       = 42
 
-# Opt 5 failure prediction settings
+
 FAILURE_LOOKAHEAD_STEPS   = 10          # "will die in next N steps"
 FAILURE_TEST_SIZE         = 0.2
 FAILURE_RANDOM_STATE      = 42
 FAILURE_ALERT_THRESHOLD   = 0.70        # probability above which we show alert
 FAILURE_MODEL_PATH        = os.path.join(MODELS_DIR, "failure_predictor.pkl")
 
-# Opt 6 anomaly detection settings
+
 ANOMALY_CONTAMINATION  = 0.05          # expected fraction of anomalous episodes
 ANOMALY_RANDOM_STATE   = 42
 ANOMALY_MODEL_PATH     = os.path.join(MODELS_DIR, "anomaly_detector.pkl")
 ANOMALY_DRIFT_WINDOW   = 10            # rolling window for drift detection
 ANOMALY_DRIFT_DROP     = 0.30          # 30% score drop triggers alert
 
-# MLflow settings
+# On Windows, os.path.join gives "D:\\path" which MLflow reads as scheme "D".
+# Prefixing with file:/// fixes this on all platforms.
 _mlflow_local_path  = os.path.join(EXPERIMENTS_DIR, "mlflow_runs")
 MLFLOW_TRACKING_URI = "file:///" + _mlflow_local_path.replace("\\", "/")
 MLFLOW_EXPERIMENT_NAME = "neuro-sentinel-snake"
 
-# Dashboard settings
-DASHBOARD_TITLE         = "Neuro-Sentinel Snake → ML Analytics Dashboard"
+
+DASHBOARD_TITLE         = "Neuro-Sentinel Snake — ML Analytics Dashboard"
 DASHBOARD_REFRESH_SECS  = 5
 
-# Game settings
+
 SNAKE_SPEED             = 30
 UNIT_SIZE               = 10

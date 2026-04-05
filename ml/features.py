@@ -9,8 +9,7 @@ import pandas as pd
 import numpy as np
 import config as C
 
-
-# Core 11-dim state vector for step-level models (Opt 1+2+5)
+# Core 11-dim state vector for step-level models (Opt 1, 2, 5)
 STATE_FEATURES = [
     "danger_up", "danger_down", "danger_left", "danger_right",
     "food_up", "food_down", "food_left", "food_right",
@@ -26,20 +25,25 @@ EPISODE_FEATURES = [
 ]
 
 # Label columns
-LABEL_ACTION      = "action"           # Opt 1+2 —> what action was taken
-LABEL_DIED_NEXT10 = "died_next_10"     # Opt 5  —> will snake die soon
-LABEL_DIED        = "died"             # Opt 6  —> did episode end in death
-
-
+LABEL_ACTION      = "action"           # Opt 1+2: what action was taken
+LABEL_DIED_NEXT10 = "died_next_10"     # Opt 5: will snake die soon
+LABEL_DIED        = "died"             # Opt 6: did episode end in death
 
 def load_game_log() -> pd.DataFrame:
-    """Load step-level log. Raises FileNotFoundError if logger hasn't run."""
-    if not os.path.exists(C.GAME_LOG_PATH):
+    """Load step-level log. Supports both game_log.csv and game_log.zip."""
+    zip_path = C.GAME_LOG_PATH.replace(".csv", ".zip")
+
+    if os.path.exists(C.GAME_LOG_PATH):
+        source = C.GAME_LOG_PATH
+    elif os.path.exists(zip_path):
+        source = zip_path
+    else:
         raise FileNotFoundError(
-            f"Game log not found at {C.GAME_LOG_PATH}.\n"
-            f"Run:  python -m ml.logger"
+            f"Game log not found at {C.GAME_LOG_PATH} or {zip_path}.\n"
+            f"Run: python -m ml.logger"
         )
-    df = pd.read_csv(C.GAME_LOG_PATH)
+
+    df = pd.read_csv(source)
     _validate_game_log(df)
     return df
 
@@ -53,12 +57,11 @@ def load_episode_stats() -> pd.DataFrame:
         )
     return pd.read_csv(C.EPISODE_STATS_PATH)
 
-
 def _validate_game_log(df: pd.DataFrame):
     """Catch common data quality issues early."""
     issues = []
 
-    # Food coordinates should never be negative that would be outside the maze
+    # Food coordinates should never be negative (would indicate a logging bug)
     if (df["food_x"] < 0).any() or (df["food_y"] < 0).any():
         issues.append("Negative food coordinates detected.")
 
@@ -80,8 +83,6 @@ def _validate_game_log(df: pd.DataFrame):
     else:
         print("[Data validation passed]")
 
-
-
 def get_imitation_data(agent: str = "AStar", exclude_mazes: list = None):
     """
     Return X (state features) and y (actions) for imitation learning.
@@ -98,10 +99,7 @@ def get_imitation_data(agent: str = "AStar", exclude_mazes: list = None):
 
 
 def get_classifier_data(exclude_mazes: list = None):
-    """
-    Return X, y for the multi-agent action classifier (Opt 2).
-    Includes data from all agents — agent identity is NOT a feature,
-    so the model learns behaviour, not identity.
+    """Return X, y for the multi-agent action classifier (Opt 2).
     """
     df = load_game_log()
     if exclude_mazes:
@@ -135,8 +133,8 @@ def get_episode_data():
 
 def get_maze_features() -> pd.DataFrame:
     """
-    Compute maze-level features by aggregating episode stats.
-    These are used for analysis and interpretation, not as ML features.
+    Return maze structural features for difficulty regression (Opt 3).
+    Computed from episode_stats by aggregating per maze.
     """
     ep = load_episode_stats()
     grouped = ep.groupby("maze").agg(
@@ -150,7 +148,7 @@ def get_maze_features() -> pd.DataFrame:
         avg_steps_per_food = ("steps_per_food",  "mean"),
     ).reset_index()
 
-
+    # Difficulty score is a weighted combination of features, higher score = more difficult
     def _norm(s):
         rng = s.max() - s.min()
         return (s - s.min()) / rng if rng > 1e-9 else pd.Series(
@@ -165,7 +163,6 @@ def get_maze_features() -> pd.DataFrame:
 
     grouped.to_csv(C.MAZE_FEATURES_PATH, index=False)
     return grouped
-
 
 
 ACTION_LABELS = {0: "Up", 3: "Right", 6: "Down", 9: "Left"}
