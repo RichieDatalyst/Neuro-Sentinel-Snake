@@ -12,7 +12,7 @@
 
 ### Note:
 Some of the visuals may not be seen as game_logs.csv file was above 100 MB. So a demo video will show that missing visuals and you can view it and interact it with locally. Also, make mazes differently for different results.
-You can change mazes for gameplay with differnt agents by updating this line #104 from main.py. maze_path = os.path.join(C.MAZES_DIR, C.MAZES[4]).
+You can change mazes for gameplay with different agents by updating this line #104 from main.py. maze_path = os.path.join(C.MAZES_DIR, C.MAZES[4]).
 
 ### Video:
 [![Snake Solver Demo](https://img.youtube.com/vi/XKWMQ6UCb3Q/0.jpg)](https://youtu.be/XKWMQ6UCb3Q)
