@@ -20,7 +20,7 @@ You can change mazes for gameplay with different agents by updating this line #1
 
 ## What This Project Does
 
-Classical pathfinding algorithms —> A\*, BFS, Greedy Best-First Search are deterministic and optimal, but they are black boxes. They make no attempt to explain their decisions, predict their own failure, or adapt based on experience.
+Classical pathfinding algorithms → A\*, BFS, Greedy Best-First Search are deterministic and optimal, but they are black boxes. They make no attempt to explain their decisions, predict their own failure, or adapt based on experience.
 
 This project treats those algorithms as **agents under audit**. It runs them across 5 maze configurations of increasing complexity, collects 4.5 million step-level observations, and applies a complete ML analysis stack to answer questions classical AI cannot answer on its own:
 
